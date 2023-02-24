@@ -60,7 +60,7 @@ export class BootstrapStack extends cdk.Stack {
             provider: provider,
             owner: ORG_NAME,
             repo: "create-data-infra",
-            filter: "ref:refs/heads/main",
+            filter: `environment:${props.account}`,
             description: "Role for Github Actions runner to assume for CD Infra deployments",
             roleName: `cd-infra-github-actions-role-${props.env.region}`,
             managedPolicies: [githubActionsPolicy],
@@ -99,7 +99,7 @@ export class BootstrapStack extends cdk.Stack {
             new statement.Ssm().allow().toGetParameter().toGetParameters().toPutParameter(),
         ];
 
-        switch (props.accountType) {
+        switch (props.account) {
             default:
                 return basePolicies;
         }
