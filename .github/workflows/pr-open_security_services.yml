@@ -1,7 +1,7 @@
 name: Pull Request Opened / Updated for Security Services Account
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
@@ -49,6 +49,9 @@ jobs:
 
       - name: cdk diff
         uses: youyo/aws-cdk-github-actions@v2
+        env:
+          ACCOUNT_TYPE: SECURITY_SERVICES
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           cdk_subcommand: 'diff'
           actions_comment: true
