@@ -25,16 +25,16 @@ export interface CDStackProps extends cdk.StackProps {
     };
 }
 
-const { ACCOUNT_TYPE: accountType } = process.env;
-const isValidAccountType = (input: string): input is Account => input in Account;
+const { ACCOUNT: account } = process.env;
+const isValidAccount = (input: string): input is Account => input in Account;
 
-if (!accountType || !isValidAccountType(accountType)) {
-    throw new Error(`ACCOUNT_TYPE env var must be provided as one of: ${Object.keys(Account).join(", ")}`);
+if (!account || !isValidAccount(account)) {
+    throw new Error(`ACCOUNT env var must be provided as one of: ${Object.keys(Account).join(", ")}`);
 }
 
 const app = new cdk.App();
 
 new BootstrapStack(app, "cd-infra-bootstrap-stack", {
     env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "eu-west-2" },
-    account: accountType,
+    account,
 });

@@ -4,7 +4,7 @@ import { CfnOutput } from "aws-cdk-lib";
 import { ManagedPolicy, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import * as statement from "cdk-iam-floyd";
 import { Construct } from "constructs";
-import { CDStackProps } from "../bin/create-data-infra";
+import { Account, CDStackProps } from "../bin/create-data-infra";
 
 export class BootstrapStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props: CDStackProps) {
@@ -66,6 +66,38 @@ export class BootstrapStack extends cdk.Stack {
             managedPolicies: [githubActionsPolicy],
         });
 
+        if (
+            props.account === Account.REF_DATA_TEST ||
+            props.account === Account.REF_DATA_PREPROD ||
+            props.account === Account.REF_DATA_PROD
+        ) {
+            new GithubActionsRole(this, "ref-data-service-github-actions-role", {
+                provider: provider,
+                owner: ORG_NAME,
+                repo: "reference-data-service",
+                filter: `environment:${props.account}`,
+                description: "Role for Github Actions runner to assume for Ref Data Service deployments",
+                roleName: `ref-data-service-github-actions-role-${props.env.region}`,
+                managedPolicies: [githubActionsPolicy],
+            });
+        }
+
+        if (
+            props.account === Account.DISRUPTIONS_TEST ||
+            props.account === Account.DISRUPTIONS_PREPROD ||
+            props.account === Account.DISRUPTIONS_PROD
+        ) {
+            new GithubActionsRole(this, "cdd-github-actions-role", {
+                provider: provider,
+                owner: ORG_NAME,
+                repo: "create-disruptions-data",
+                filter: `environment:${props.account}`,
+                description: "Role for Github Actions runner to assume for Create Disruptions deployments",
+                roleName: `cdd-github-actions-role-${props.env.region}`,
+                managedPolicies: [githubActionsPolicy],
+            });
+        }
+
         const cdkExecutionPolicy = new ManagedPolicy(this, "cd-infra-cdk-execution-policy", {
             managedPolicyName: `cd-infra-cdk-execution-policy-${props.env.region}`,
             statements: this.createCdkPolicyStatements(props),
@@ -96,10 +128,29 @@ export class BootstrapStack extends cdk.Stack {
             new statement.Lambda().allow().allActions().ifAwsRequestedRegion(allowedRegions),
             new statement.Logs().allow().allActions().ifAwsRequestedRegion(allowedRegions),
             new statement.S3().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-            new statement.Ssm().allow().toGetParameter().toGetParameters().toPutParameter(),
+            new statement.Sqs().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+            new statement.Events().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+            new statement.Ssm().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+            new statement.Secretsmanager().allow().allActions().ifAwsRequestedRegion(allowedRegions),
         ];
 
         switch (props.account) {
+            case Account.REF_DATA_TEST:
+                return [
+                    ...basePolicies,
+                    new statement.ApigatewayV2().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new statement.Rds().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new statement.Ec2().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new statement.Ec2()
+                        .deny()
+                        .toRunInstances()
+                        .toRunScheduledInstances()
+                        .toCreateLaunchTemplate()
+                        .toCreateKeyPair()
+                        .toCreateTransitGateway()
+                        .toCreateVpnGateway()
+                        .toCreateVpnConnection(),
+                ];
             default:
                 return basePolicies;
         }
