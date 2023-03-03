@@ -67,11 +67,7 @@ export class BootstrapStack extends cdk.Stack {
                 managedPolicies: [githubActionsPolicy],
             });
 
-            if (
-                props.account === Account.REF_DATA_TEST ||
-                props.account === Account.REF_DATA_PREPROD ||
-                props.account === Account.REF_DATA_PROD
-            ) {
+            if (props.account === Account.REF_DATA) {
                 new GithubActionsRole(this, "ref-data-service-github-actions-role", {
                     provider: provider,
                     owner: ORG_NAME,
@@ -83,11 +79,7 @@ export class BootstrapStack extends cdk.Stack {
                 });
             }
 
-            if (
-                props.account === Account.DISRUPTIONS_TEST ||
-                props.account === Account.DISRUPTIONS_PREPROD ||
-                props.account === Account.DISRUPTIONS_PROD
-            ) {
+            if (props.account === Account.DISRUPTIONS) {
                 new GithubActionsRole(this, "cdd-github-actions-role", {
                     provider: provider,
                     owner: ORG_NAME,
@@ -138,7 +130,7 @@ export class BootstrapStack extends cdk.Stack {
         switch (props.account) {
             case Account.SHARED_SERVICES:
                 return [...basePolicies, new statement.Ses().allow().allActions()];
-            case Account.REF_DATA_TEST:
+            case Account.REF_DATA:
                 return [
                     ...basePolicies,
                     new statement.ApigatewayV2().allow().allActions().ifAwsRequestedRegion(allowedRegions),
@@ -154,9 +146,7 @@ export class BootstrapStack extends cdk.Stack {
                         .toCreateVpnGateway()
                         .toCreateVpnConnection(),
                 ];
-            case Account.DISRUPTIONS_TEST:
-            case Account.DISRUPTIONS_PREPROD:
-            case Account.DISRUPTIONS_PROD:
+            case Account.DISRUPTIONS:
                 return [
                     ...basePolicies,
                     new statement.Dynamodb().allow().allActions(),
