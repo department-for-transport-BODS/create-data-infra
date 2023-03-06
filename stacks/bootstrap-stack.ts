@@ -67,24 +67,24 @@ export class BootstrapStack extends cdk.Stack {
                 managedPolicies: [githubActionsPolicy],
             });
 
-            if (props.account === Account.REF_DATA) {
+            if (props.account === Account.REF_DATA && props.stage) {
                 new GithubActionsRole(this, "ref-data-service-github-actions-role", {
                     provider: provider,
                     owner: ORG_NAME,
                     repo: "reference-data-service",
-                    filter: `environment:${props.account}`,
+                    filter: `environment:${props.account}_${props.stage}`,
                     description: "Role for Github Actions runner to assume for Ref Data Service deployments",
                     roleName: `ref-data-service-github-actions-role-${props.env.region}`,
                     managedPolicies: [githubActionsPolicy],
                 });
             }
 
-            if (props.account === Account.DISRUPTIONS) {
+            if (props.account === Account.DISRUPTIONS && props.stage) {
                 new GithubActionsRole(this, "cdd-github-actions-role", {
                     provider: provider,
                     owner: ORG_NAME,
                     repo: "create-disruptions-data",
-                    filter: `environment:${props.account}`,
+                    filter: `environment:${props.account}_${props.stage}`,
                     description: "Role for Github Actions runner to assume for Create Disruptions deployments",
                     roleName: `cdd-github-actions-role-${props.env.region}`,
                     managedPolicies: [githubActionsPolicy],
