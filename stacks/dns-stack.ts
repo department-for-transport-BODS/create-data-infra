@@ -1,10 +1,11 @@
 import * as cdk from "aws-cdk-lib";
 import { HostedZone, MxRecord } from "aws-cdk-lib/aws-route53";
 import { Construct } from "constructs";
-import { CDStackProps } from "../../bin/create-data-infra";
+import { CDStackProps } from "../bin/create-data-infra";
 
 interface DnsStackProps extends CDStackProps {
     domain: string;
+    createMxRecord?: boolean;
 }
 
 export class DnsStack extends cdk.Stack {
@@ -17,15 +18,17 @@ export class DnsStack extends cdk.Stack {
             zoneName: props.domain,
         });
 
-        new MxRecord(this, "cd-infra-mx-record", {
-            zone: createDataHostedZone,
-            values: [
-                {
-                    hostName: "inbound-smtp.us-east-1.amazonaws.com",
-                    priority: 10,
-                },
-            ],
-        });
+        if (props.createMxRecord) {
+            new MxRecord(this, "cd-infra-mx-record", {
+                zone: createDataHostedZone,
+                values: [
+                    {
+                        hostName: "inbound-smtp.us-east-1.amazonaws.com",
+                        priority: 10,
+                    },
+                ],
+            });
+        }
 
         this.hostedZone = createDataHostedZone;
     }

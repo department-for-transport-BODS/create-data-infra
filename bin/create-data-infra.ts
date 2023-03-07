@@ -3,7 +3,7 @@ import "source-map-support/register";
 import * as cdk from "aws-cdk-lib";
 import * as dotenv from "dotenv";
 import { BootstrapStack } from "../stacks/bootstrap-stack";
-import { DnsStack as SharedDnsStack } from "../stacks/shared-services/dns-stack";
+import { DnsStack as SharedDnsStack } from "../stacks/dns-stack";
 import { SesStack } from "../stacks/shared-services/ses-stack";
 
 dotenv.config();
@@ -66,6 +66,7 @@ if (account === Account.SHARED_SERVICES) {
         env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "us-east-1" },
         account,
         domain,
+        createMxRecord: true,
     });
 
     new SesStack(app, "cd-infra-shared-services-ses-stack", {
@@ -73,5 +74,31 @@ if (account === Account.SHARED_SERVICES) {
         account,
         domain,
         hostedZone: dnsStack.hostedZone,
+    });
+}
+
+if (account === Account.DISRUPTIONS) {
+    if (!domain || !stage) {
+        throw new Error("DOMAIN and STAGE env vars must be set");
+    }
+
+    new SharedDnsStack(app, "cd-infra-cdd-dns-stack", {
+        env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "eu-west-2" },
+        account,
+        domain: `${stage.replace("_", "").toLowerCase()}.cdd.${domain}`,
+        createMxRecord: false,
+    });
+}
+
+if (account === Account.REF_DATA) {
+    if (!domain || !stage) {
+        throw new Error("DOMAIN and STAGE env vars must be set");
+    }
+
+    new SharedDnsStack(app, "cd-infra-ref-data-dns-stack", {
+        env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "eu-west-2" },
+        account,
+        domain: `${stage.replace("_", "").toLowerCase()}.ref-data.${domain}`,
+        createMxRecord: false,
     });
 }
