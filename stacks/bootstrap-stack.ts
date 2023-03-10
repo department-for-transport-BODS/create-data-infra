@@ -123,6 +123,7 @@ export class BootstrapStack extends cdk.Stack {
             new statement.Events().allow().allActions().ifAwsRequestedRegion(allowedRegions),
             new statement.Ssm().allow().allActions().ifAwsRequestedRegion(allowedRegions),
             new statement.Secretsmanager().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+            new statement.Acm().allow().allActions(),
             new statement.Route53().allow().allActions(),
             new statement.Cloudfront().allow().allActions(),
         ];
