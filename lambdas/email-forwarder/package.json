@@ -2,6 +2,6 @@
     "name": "@create-data-infra/email-forwarder",
     "version": "0.1.0",
     "dependencies": {
-        "aws-sdk": "^2.1324.0"
+        "aws-sdk": "^2.1356.0"
     }
 }
