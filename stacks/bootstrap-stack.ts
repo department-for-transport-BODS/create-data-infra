@@ -137,6 +137,7 @@ export class BootstrapStack extends cdk.Stack {
                     new statement.ApigatewayV2().allow().allActions().ifAwsRequestedRegion(allowedRegions),
                     new statement.Rds().allow().allActions().ifAwsRequestedRegion(allowedRegions),
                     new statement.Ec2().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new statement.Ses().allow().allActions(),
                     new statement.Ec2()
                         .deny()
                         .toRunInstances()
@@ -152,6 +153,7 @@ export class BootstrapStack extends cdk.Stack {
                     ...basePolicies,
                     new statement.Dynamodb().allow().allActions(),
                     new statement.Apigateway().allow().allActions(),
+                    new statement.Ses().allow().allActions(),
                 ];
             default:
                 return basePolicies;

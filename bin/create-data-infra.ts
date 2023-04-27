@@ -4,7 +4,8 @@ import * as cdk from "aws-cdk-lib";
 import * as dotenv from "dotenv";
 import { BootstrapStack } from "../stacks/bootstrap-stack";
 import { DnsStack as SharedDnsStack } from "../stacks/dns-stack";
-import { SesStack } from "../stacks/shared-services/ses-stack";
+import { SesStack } from "../stacks/ses-stack";
+import { SesStack as SharedSesStack } from "../stacks/shared-services/ses-stack";
 
 dotenv.config();
 
@@ -69,7 +70,7 @@ if (account === Account.SHARED_SERVICES) {
         createMxRecord: true,
     });
 
-    new SesStack(app, "cd-infra-shared-services-ses-stack", {
+    new SharedSesStack(app, "cd-infra-shared-services-ses-stack", {
         env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "us-east-1" },
         account,
         domain,
@@ -82,11 +83,18 @@ if (account === Account.DISRUPTIONS) {
         throw new Error("DOMAIN and STAGE env vars must be set");
     }
 
-    new SharedDnsStack(app, "cd-infra-cdd-dns-stack", {
+    const disruptionsDnsStack = new SharedDnsStack(app, "cd-infra-cdd-dns-stack", {
         env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "eu-west-2" },
         account,
         domain: `${stage.replace("_", "").toLowerCase()}.cdd.${domain}`,
         createMxRecord: false,
+    });
+
+    new SesStack(app, "cd-infra-disruptions-ses-stack", {
+        env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "eu-west-2" },
+        domain: `${stage.replace("_", "").toLowerCase()}.cdd.${domain}`,
+        hostedZone: disruptionsDnsStack.hostedZone,
+        account,
     });
 }
 
@@ -95,10 +103,17 @@ if (account === Account.REF_DATA) {
         throw new Error("DOMAIN and STAGE env vars must be set");
     }
 
-    new SharedDnsStack(app, "cd-infra-ref-data-dns-stack", {
+    const refDataDnsStack = new SharedDnsStack(app, "cd-infra-ref-data-dns-stack", {
         env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "eu-west-2" },
         account,
         domain: `${stage.replace("_", "").toLowerCase()}.ref-data.${domain}`,
         createMxRecord: false,
+    });
+
+    new SesStack(app, "cd-infra-ref-data-ses-stack", {
+        env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: "eu-west-2" },
+        domain: `${stage.replace("_", "").toLowerCase()}.ref-data.${domain}`,
+        hostedZone: refDataDnsStack.hostedZone,
+        account,
     });
 }
