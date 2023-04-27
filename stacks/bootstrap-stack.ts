@@ -30,6 +30,7 @@ export class BootstrapStack extends cdk.Stack {
                         .allow()
                         .toDescribeStacks()
                         .toDescribeStackEvents()
+                        .toDescribeStackResources()
                         .toDescribeChangeSet()
                         .toCreateChangeSet()
                         .toDeleteChangeSet()
