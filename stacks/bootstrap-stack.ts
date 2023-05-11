@@ -152,9 +152,18 @@ export class BootstrapStack extends cdk.Stack {
             case Account.DISRUPTIONS:
                 return [
                     ...basePolicies,
+                    new statement.Iam()
+                        .allow()
+                        .toCreateUser()
+                        .toGetUser()
+                        .toGetUserPolicy()
+                        .toCreateAccessKey()
+                        .toAttachUserPolicy()
+                        .toDetachUserPolicy(),
                     new statement.Dynamodb().allow().allActions(),
                     new statement.Apigateway().allow().allActions(),
                     new statement.Ses().allow().allActions(),
+                    new statement.CognitoIdp().allow().allActions(),
                 ];
             default:
                 return basePolicies;
