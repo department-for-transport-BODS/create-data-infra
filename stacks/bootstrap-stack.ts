@@ -35,7 +35,9 @@ export class BootstrapStack extends cdk.Stack {
                         .toCreateChangeSet()
                         .toDeleteChangeSet()
                         .toExecuteChangeSet()
-                        .toGetTemplate(),
+                        .toGetTemplate()
+                        .toListImports()
+                        .toListExports(),
                     new statement.Ssm().allow().toGetParameter().toGetParameters().toPutParameter(),
                     new statement.S3()
                         .allow()
