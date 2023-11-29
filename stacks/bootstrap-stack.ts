@@ -126,6 +126,7 @@ export class BootstrapStack extends cdk.Stack {
             new statement.Events().allow().allActions().ifAwsRequestedRegion(allowedRegions),
             new statement.Ssm().allow().allActions().ifAwsRequestedRegion(allowedRegions),
             new statement.Secretsmanager().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+            new statement.Sns().allow().allActions().ifAwsRequestedRegion(allowedRegions),
             new statement.Acm().allow().allActions(),
             new statement.Route53().allow().allActions(),
             new statement.Cloudfront().allow().allActions(),
@@ -166,6 +167,9 @@ export class BootstrapStack extends cdk.Stack {
                     new statement.Apigateway().allow().allActions(),
                     new statement.Ses().allow().allActions(),
                     new statement.CognitoIdp().allow().allActions(),
+                    new statement.Backup().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new statement.BackupStorage().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new statement.Kms().allow().allActions().ifAwsRequestedRegion(allowedRegions),
                 ];
             default:
                 return basePolicies;
