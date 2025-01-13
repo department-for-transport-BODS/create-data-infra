@@ -162,7 +162,12 @@ export class BootstrapStack extends cdk.Stack {
                         .toGetUserPolicy()
                         .toCreateAccessKey()
                         .toAttachUserPolicy()
-                        .toDetachUserPolicy(),
+                        .toDetachUserPolicy()
+                        .toCreateInstanceProfile()
+                        .toDeleteInstanceProfile()
+                        .toGetInstanceProfile()
+                        .toAddRoleToInstanceProfile()
+                        .toListInstanceProfiles(),
                     new statement.Dynamodb().allow().allActions(),
                     new statement.Apigateway().allow().allActions(),
                     new statement.Ses().allow().allActions(),
@@ -170,6 +175,8 @@ export class BootstrapStack extends cdk.Stack {
                     new statement.Backup().allow().allActions().ifAwsRequestedRegion(allowedRegions),
                     new statement.BackupStorage().allow().allActions().ifAwsRequestedRegion(allowedRegions),
                     new statement.Kms().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new statement.Ec2().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new statement.Rds().allow().allActions().ifAwsRequestedRegion(allowedRegions),
                 ];
             default:
                 return basePolicies;

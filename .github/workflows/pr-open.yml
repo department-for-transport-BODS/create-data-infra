@@ -18,10 +18,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install packages
-        run: npm ci
+        run: pnpm i --frozen-lockfile
 
       - name: Lint
-        run: npm run lint
+        run: pnpm run lint

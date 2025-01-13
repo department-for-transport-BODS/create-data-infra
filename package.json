@@ -8,9 +8,12 @@
         "build": "tsc",
         "watch": "tsc -w",
         "cdk": "cdk",
-        "lint": "eslint . --ignore-pattern node_modules --ignore-pattern cdk.out"
+        "lint": "pnpm biome check .",
+        "lint:fix": "pnpm biome check --fix --unsafe .",
+        "preinstall": "npx only-allow pnpm"
     },
     "devDependencies": {
+        "@biomejs/biome": "^1.9.4",
         "@types/node": "18.13.0",
         "@typescript-eslint/eslint-plugin": "^5.52.0",
         "@typescript-eslint/parser": "^5.52.0",
