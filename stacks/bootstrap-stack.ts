@@ -2,7 +2,7 @@ import { GithubActionsIdentityProvider, GithubActionsRole } from "aws-cdk-github
 import * as cdk from "aws-cdk-lib";
 import { CfnOutput } from "aws-cdk-lib";
 import { ManagedPolicy, PolicyStatement } from "aws-cdk-lib/aws-iam";
-import * as statement from "cdk-iam-floyd";
+import { Statement } from "cdk-iam-floyd";
 import { Construct } from "constructs";
 import { Account, CDStackProps } from "../bin/create-data-infra";
 
@@ -17,8 +17,8 @@ export class BootstrapStack extends cdk.Stack {
 
             const githubActionsPolicy = new ManagedPolicy(this, "cd-infra-github-actions-policy", {
                 statements: [
-                    new statement.Sts().allow().toAssumeRole().on(`arn:aws:iam::${this.account}:role/cdk-*`),
-                    new statement.Iam()
+                    new Statement.Sts().allow().toAssumeRole().on(`arn:aws:iam::${this.account}:role/cdk-*`),
+                    new Statement.Iam()
                         .allow()
                         .toGetRole()
                         .toCreateRole()
@@ -26,7 +26,7 @@ export class BootstrapStack extends cdk.Stack {
                         .toGetRolePolicy()
                         .toPutRolePolicy()
                         .toDetachRolePolicy(),
-                    new statement.Cloudformation()
+                    new Statement.Cloudformation()
                         .allow()
                         .toDescribeStacks()
                         .toDescribeStackEvents()
@@ -38,8 +38,8 @@ export class BootstrapStack extends cdk.Stack {
                         .toGetTemplate()
                         .toListImports()
                         .toListExports(),
-                    new statement.Ssm().allow().toGetParameter().toGetParameters().toPutParameter(),
-                    new statement.S3()
+                    new Statement.Ssm().allow().toGetParameter().toGetParameters().toPutParameter(),
+                    new Statement.S3()
                         .allow()
                         .toCreateBucket()
                         .toPutEncryptionConfiguration()
@@ -49,7 +49,7 @@ export class BootstrapStack extends cdk.Stack {
                         .toGetBucketPolicy()
                         .toPutBucketPolicy()
                         .onBucket("arn:aws:s3:::cdk*"),
-                    new statement.Ecr()
+                    new Statement.Ecr()
                         .allow()
                         .toCreateRepository()
                         .toSetRepositoryPolicy()
@@ -109,7 +109,7 @@ export class BootstrapStack extends cdk.Stack {
         const allowedRegions = ["eu-west-2", "us-east-1"];
 
         const basePolicies = [
-            new statement.Iam()
+            new Statement.Iam()
                 .allow()
                 .allMatchingActions("/.*Role.*/i")
                 .allMatchingActions("/.*PolicyVersion.*/i")
@@ -118,31 +118,31 @@ export class BootstrapStack extends cdk.Stack {
                 .toDeletePolicy()
                 .notResource()
                 .on("arn:aws:iam::*:role/cdk-*"),
-            new statement.Cloudwatch().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-            new statement.Lambda().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-            new statement.Logs().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-            new statement.S3().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-            new statement.Sqs().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-            new statement.Events().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-            new statement.Ssm().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-            new statement.Secretsmanager().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-            new statement.Sns().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-            new statement.Acm().allow().allActions(),
-            new statement.Route53().allow().allActions(),
-            new statement.Cloudfront().allow().allActions(),
+            new Statement.Cloudwatch().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+            new Statement.Lambda().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+            new Statement.Logs().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+            new Statement.S3().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+            new Statement.Sqs().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+            new Statement.Events().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+            new Statement.Ssm().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+            new Statement.Secretsmanager().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+            new Statement.Sns().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+            new Statement.Acm().allow().allActions(),
+            new Statement.Route53().allow().allActions(),
+            new Statement.Cloudfront().allow().allActions(),
         ];
 
         switch (props.account) {
             case Account.SHARED_SERVICES:
-                return [...basePolicies, new statement.Ses().allow().allActions()];
+                return [...basePolicies, new Statement.Ses().allow().allActions()];
             case Account.REF_DATA:
                 return [
                     ...basePolicies,
-                    new statement.ApigatewayV2().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-                    new statement.Rds().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-                    new statement.Ec2().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-                    new statement.Ses().allow().allActions(),
-                    new statement.Ec2()
+                    new Statement.ApigatewayV2().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new Statement.Rds().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new Statement.Ec2().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new Statement.Ses().allow().allActions(),
+                    new Statement.Ec2()
                         .deny()
                         .toRunInstances()
                         .toRunScheduledInstances()
@@ -155,7 +155,7 @@ export class BootstrapStack extends cdk.Stack {
             case Account.DISRUPTIONS:
                 return [
                     ...basePolicies,
-                    new statement.Iam()
+                    new Statement.Iam()
                         .allow()
                         .toCreateUser()
                         .toGetUser()
@@ -168,15 +168,16 @@ export class BootstrapStack extends cdk.Stack {
                         .toGetInstanceProfile()
                         .toAddRoleToInstanceProfile()
                         .toListInstanceProfiles(),
-                    new statement.Dynamodb().allow().allActions(),
-                    new statement.Apigateway().allow().allActions(),
-                    new statement.Ses().allow().allActions(),
-                    new statement.CognitoIdp().allow().allActions(),
-                    new statement.Backup().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-                    new statement.BackupStorage().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-                    new statement.Kms().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-                    new statement.Ec2().allow().allActions().ifAwsRequestedRegion(allowedRegions),
-                    new statement.Rds().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new Statement.Dynamodb().allow().allActions(),
+                    new Statement.Apigateway().allow().allActions(),
+                    new Statement.Ses().allow().allActions(),
+                    new Statement.CognitoIdp().allow().allActions(),
+                    new Statement.Backup().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new Statement.BackupStorage().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new Statement.Kms().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new Statement.Ec2().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new Statement.Rds().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new Statement.States().allow().allActions().ifAwsRequestedRegion(allowedRegions),
                 ];
             default:
                 return basePolicies;

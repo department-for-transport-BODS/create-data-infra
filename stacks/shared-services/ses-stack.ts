@@ -7,7 +7,7 @@ import { HostedZone } from "aws-cdk-lib/aws-route53";
 import { Bucket, BucketEncryption } from "aws-cdk-lib/aws-s3";
 import { EmailIdentity, ReceiptRuleSet } from "aws-cdk-lib/aws-ses";
 import * as actions from "aws-cdk-lib/aws-ses-actions";
-import * as statement from "cdk-iam-floyd";
+import { Statement } from "cdk-iam-floyd";
 import { Construct } from "constructs";
 import { CDStackProps } from "../../bin/create-data-infra";
 
@@ -36,9 +36,9 @@ export class SesStack extends cdk.Stack {
             "cd-infra-email-forwarder-lambda-role-policy",
             {
                 statements: [
-                    new statement.Logs().allow().toCreateLogStream().toCreateLogGroup().toPutLogEvents(),
-                    new statement.S3().allow().toGetObject().toPutObject().onObject(emailBucket.bucketName, "*"),
-                    new statement.Ses().allow().toSendRawEmail().on(`arn:aws:ses:us-east-1:${this.account}:identity/*`),
+                    new Statement.Logs().allow().toCreateLogStream().toCreateLogGroup().toPutLogEvents(),
+                    new Statement.S3().allow().toGetObject().toPutObject().onObject(emailBucket.bucketName, "*"),
+                    new Statement.Ses().allow().toSendRawEmail().on(`arn:aws:ses:us-east-1:${this.account}:identity/*`),
                 ],
             },
         );
