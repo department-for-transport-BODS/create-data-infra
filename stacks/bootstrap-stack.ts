@@ -178,6 +178,7 @@ export class BootstrapStack extends cdk.Stack {
                     new Statement.Ec2().allow().allActions().ifAwsRequestedRegion(allowedRegions),
                     new Statement.Rds().allow().allActions().ifAwsRequestedRegion(allowedRegions),
                     new Statement.States().allow().allActions().ifAwsRequestedRegion(allowedRegions),
+                    new Statement.Scheduler().allow().allActions().ifAwsRequestedRegion(allowedRegions),
                 ];
             default:
                 return basePolicies;
