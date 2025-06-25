@@ -57,6 +57,12 @@ export class BootstrapStack extends cdk.Stack {
                         .toListTagsForResource()
                         .toGetLifecyclePolicy()
                         .toGetRepositoryPolicy(),
+                    new Statement.Lambda()
+                        .allow()
+                        .toInvokeFunction()
+                        .on(
+                            `arn:aws:lambda:${this.region}:${this.account}:function:cdd-kysely-db-migrator-migrate-${props.stage?.toLowerCase()}`,
+                        ),
                 ],
             });
 
