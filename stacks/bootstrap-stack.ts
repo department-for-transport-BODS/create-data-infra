@@ -11,7 +11,7 @@ export class BootstrapStack extends cdk.Stack {
         super(scope, id, props);
 
         if (props.env.region === "eu-west-2") {
-            const ORG_NAME = "Department-for-Transport-Disruptions";
+            const ORG_NAME = "department-for-transport-BODS";
 
             const provider = new GithubActionsIdentityProvider(this, "cd-infra-github-actions-provider");
 
