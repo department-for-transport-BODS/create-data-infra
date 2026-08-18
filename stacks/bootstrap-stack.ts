@@ -30,6 +30,7 @@ export class BootstrapStack extends cdk.Stack {
                     new Statement.Cloudformation()
                         .allow()
                         .toDescribeStacks()
+                        .toUpdateStack()
                         .toDescribeStackEvents()
                         .toDescribeStackResources()
                         .toDescribeChangeSet()
