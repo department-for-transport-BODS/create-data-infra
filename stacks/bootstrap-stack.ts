@@ -25,7 +25,8 @@ export class BootstrapStack extends cdk.Stack {
                         .toAttachRolePolicy()
                         .toGetRolePolicy()
                         .toPutRolePolicy()
-                        .toDetachRolePolicy(),
+                        .toDetachRolePolicy()
+                        .toPassRole(),
                     new Statement.Cloudformation()
                         .allow()
                         .toDescribeStacks()
