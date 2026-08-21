@@ -50,7 +50,9 @@ export class BootstrapStack extends cdk.Stack {
                         .toPutBucketPublicAccessBlock()
                         .toGetBucketPolicy()
                         .toPutBucketPolicy()
-                        .onBucket("arn:aws:s3:::cdk*"),
+                        .toGetObject()
+                        .toPutObject()
+                        .on("arn:aws:s3:::cdk*"),
                     new Statement.Ecr()
                         .allow()
                         .toCreateRepository()
